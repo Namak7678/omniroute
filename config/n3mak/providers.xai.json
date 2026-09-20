@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "provider": "xai",
+      "name": "n3mak-xai-grok",
+      "defaultModel": "grok-4.3",
+      "priority": 1,
+      "credentialEnv": "XAI_API_KEY"
+    }
+  ]
+}
