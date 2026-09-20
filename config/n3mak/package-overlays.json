@@ -2,6 +2,7 @@
   "scripts": {
     "n3mak:activate": "node scripts/n3mak/activate-grok.mjs",
     "n3mak:smoke": "node scripts/n3mak/smoke-grok.mjs",
+    "n3mak:smoke-free": "node scripts/n3mak/smoke-free.mjs",
     "n3mak:client": "node examples/n3mak/openai_client.mjs"
   },
   "allowScripts": {

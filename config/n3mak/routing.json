@@ -1,14 +1,20 @@
 {
-  "profile": "n3mak-grok",
-  "description": "Prefer official xAI Grok via OmniRoute OpenAI-compatible /v1",
+  "profile": "n3mak-free",
+  "description": "Default free Cloudflare Playground (cfp/*). Official xAI Grok is optional paid fallback.",
   "baseUrl": "http://127.0.0.1:20128/v1",
-  "defaultModel": "xai/grok-4.3",
+  "defaultModel": "cfp/openai/gpt-oss-20b",
   "fallbackModels": [
+    "cfp/zai-org/glm-4.7-flash",
+    "cfp/openai/gpt-oss-120b",
+    "cfp/moonshotai/kimi-k2.6",
+    "xai/grok-4.3",
     "xai/grok-4.6",
     "xai/grok-4.20-0309-non-reasoning",
     "xai/grok-build-0.1"
   ],
   "providerIds": {
+    "freePlayground": "cloudflare-playground",
+    "freeAlias": "cfp",
     "apiKey": "xai",
     "oauth": "xai-oauth",
     "oauthAlias": "xao",
@@ -22,6 +28,7 @@
   },
   "envVars": {
     "requiredForLiveGrok": ["XAI_API_KEY"],
+    "requiredForFreePath": [],
     "optional": [
       "OMNIROUTE_API_KEY",
       "OMNIROUTE_BASE_URL",
