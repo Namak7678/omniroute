@@ -1,55 +1,29 @@
-# N3mak ↔ OmniRoute ↔ Grok / xAI
+# N3mak ↔ OmniRoute ↔ Free AI (and optional Grok)
 
 **English** · [العربية](#العربية)
 
-Wire [N3mak_Bot](https://github.com/Namak7678/N3mak_Bot) (or any OpenAI-compatible client) through this OmniRoute fork to **official xAI Grok**.
+Wire [N3mak_Bot](https://github.com/Namak7678/N3mak_Bot) (or any OpenAI-compatible client) through this OmniRoute fork.
 
-## What is already first-class in OmniRoute
+## Free path (no xAI billing) — recommended
 
-| Provider id | Auth | Upstream | Notes |
-|-------------|------|----------|--------|
-| `xai` | API key (`XAI_API_KEY`) | `https://api.x.ai/v1/chat/completions` (+ `/v1/responses`) | **Preferred for N3mak** |
-| `xai-oauth` / `xao` | OAuth (SuperGrok) | same | Dashboard “Sign in with xAI” |
-| `grok-web` | Browser / TLS sidecar | Grok web | Needs `OMNIROUTE_GROK_TLS_*`, `GROK_AUTH_PATH` |
-| `grok-cli` | Grok Build JWT | cli-chat-proxy | Separate from API key |
+Uses **Cloudflare AI Playground** (`cfp/*`) — no API key, no console.x.ai payment.
 
-Catalog models (API key path): `grok-4.6`, `grok-4.3`, `grok-4.20-*`, `grok-build-0.1`.
-
-## Activate (this machine)
+**Verified live model:** `cfp/openai/gpt-oss-20b`
 
 ```bash
-# Node 24 (engines: >=22.22.2 <23 || >=24 <27). npm 11 needs script approvals:
-npm install-scripts approve better-sqlite3 tls-client-node
 npm install
-# .env is created from .env.example on postinstall
-
-# Merge N3mak profile (optional) then set the only required live secret:
-cp .env.n3mak.example .env.n3mak   # reference
-# Edit .env → XAI_API_KEY=xai-...
-
-npm run dev                        # http://127.0.0.1:20128
-npm run n3mak:activate             # registers provider xai from XAI_API_KEY
-npm run n3mak:smoke                # live chat smoke (needs key + server)
+npx playwright install chromium   # required for cfp/*
+npm run dev                       # http://127.0.0.1:20128
+node scripts/n3mak/smoke-free.mjs # or: npm run n3mak:smoke-free
 ```
 
-Files:
-
-- `.env.n3mak.example` — documented env vars (no secrets)
-- `config/n3mak/providers.xai.json` — `omniroute providers import` template
-- `config/n3mak/routing.json` — default model routing for N3mak
-- `scripts/n3mak/activate-grok.mjs` / `smoke-grok.mjs`
-
-## Connect N3mak_Bot
-
-OmniRoute OpenAI-compatible endpoint:
+Point N3mak_Bot / any OpenAI client:
 
 ```
 OPENAI_BASE_URL=http://127.0.0.1:20128/v1
-OPENAI_API_KEY=<any OmniRoute key or n3mak-local>
-OPENAI_MODEL=xai/grok-4.3
+OPENAI_API_KEY=n3mak-local
+OPENAI_MODEL=cfp/openai/gpt-oss-20b
 ```
-
-In `/workspace/N3mak_Bot/bot/.env.example` (or Railway service vars), add the same three variables. A thin client helper lives at `examples/n3mak/openai_client.mjs`.
 
 Minimal curl:
 
@@ -57,46 +31,61 @@ Minimal curl:
 curl http://127.0.0.1:20128/v1/chat/completions \
   -H "Authorization: Bearer n3mak-local" \
   -H "Content-Type: application/json" \
-  -d '{"model":"xai/grok-4.3","messages":[{"role":"user","content":"ping"}]}'
+  -d '{"model":"cfp/openai/gpt-oss-20b","messages":[{"role":"user","content":"Reply with exactly: free-ok"}]}'
 ```
 
-## Without an API key
+Other free `cfp/*` fallbacks: `cfp/zai-org/glm-4.7-flash`, `cfp/openai/gpt-oss-120b`, `cfp/moonshotai/kimi-k2.6`.
 
-Install + `npm run dev` still work (OmniRoute zero-config free providers). Live **Grok** calls stay blocked until `XAI_API_KEY` is set — that is the only remaining step.
+If Playwright is missing you will see `Executable doesn't exist` / `chromium_headless_shell` — run `npx playwright install chromium` again.
+
+Config files:
+
+- `.env.n3mak.example` — free defaults (`N3MAK_DEFAULT_MODEL=cfp/openai/gpt-oss-20b`)
+- `config/n3mak/routing.json` — free-first routing
+- `scripts/n3mak/smoke-free.mjs`
+
+## Optional: official xAI Grok (paid)
+
+| Provider id | Auth | Upstream | Notes |
+|-------------|------|----------|--------|
+| `xai` | API key (`XAI_API_KEY`) | `https://api.x.ai/v1/chat/completions` | Requires console.x.ai key (billing) |
+| `xai-oauth` / `xao` | OAuth (SuperGrok) | same | Dashboard “Sign in with xAI” |
+| `grok-web` | Browser / TLS sidecar | Grok web | Needs `OMNIROUTE_GROK_TLS_*` |
+| `grok-cli` | Grok Build JWT | cli-chat-proxy | Separate from API key |
+
+```bash
+# Edit .env → XAI_API_KEY=xai-...
+npm run n3mak:activate
+# set OPENAI_MODEL=xai/grok-4.3
+npm run n3mak:smoke
+```
 
 ---
 
 ## Install notes (this fork / Cloud Agents box)
 
-- **Node**: use 24.x (`nvm use 24`). Engines require `>=22.22.2 <23 || >=24 <27`.
-- **npm ≥ 11**: approve native install scripts before/after install:
-
-```bash
-npm install-scripts approve better-sqlite3 tls-client-node onnxruntime-node
-npm install
-```
-
-  `package.json` `allowScripts` already pins these so a fresh clone is quieter.
-- **Ready-to-run path**: `npm run dev` (port **20128**). Verified: `/api/health` → `{"status":"ok"}`.
-- **Full `npm run build`**: Next.js 16 production compile can exceed ~11GB RSS and get OOM-killed on a 15GB box. Prefer `npm run dev` for activation; use a larger machine or CI for release builds.
-- **OmniRoute API key**: create via dashboard login (`INITIAL_PASSWORD`, default `CHANGEME`) → Keys, or `POST /api/keys`. Put it in `OMNIROUTE_API_KEY` (gitignored `.env`).
+- **Node**: use 24.x. Engines require `>=22.22.2 <23 || >=24 <27`.
+- **Playwright**: required for free `cfp/*` path.
+- **Ready-to-run**: `npm run dev` (port **20128**). `/api/health` → `{"status":"ok"}`.
+- **Full `npm run build`**: may OOM on ~15GB boxes — prefer `npm run dev`.
 
 ## العربية
 
-اربط **N3mak_Bot** بهذا الـ fork من OmniRoute لاستخدام **Grok الرسمي من xAI**.
+### المسار المجاني (بدون دفع xAI) — الموصى به
 
-### التفعيل
-
-1. `npm install` ثم ضع المفتاح في `.env`: `XAI_API_KEY=...` (من https://console.x.ai)
-2. `npm run dev` → الخادم على `http://127.0.0.1:20128`
-3. `npm run n3mak:activate` ثم `npm run n3mak:smoke`
-
-### ربط البوت
+1. `npm install` ثم `npx playwright install chromium`
+2. `npm run dev` على المنفذ `20128`
+3. `node scripts/n3mak/smoke-free.mjs`
+4. في البوت:
 
 ```
 OPENAI_BASE_URL=http://127.0.0.1:20128/v1
 OPENAI_API_KEY=n3mak-local
-OPENAI_MODEL=xai/grok-4.3
+OPENAI_MODEL=cfp/openai/gpt-oss-20b
 ```
 
-بدون مفتاح xAI يبقى التثبيت والتشغيل جاهزين؛ استدعاء Grok الحي يحتاج `XAI_API_KEY` فقط.
+النموذج المُتحقق: `cfp/openai/gpt-oss-20b` عبر Cloudflare Playground داخل OmniRoute.
+
+### اختياري: Grok الرسمي
+
+ضع `XAI_API_KEY` من console.x.ai ثم `npm run n3mak:activate` وغيّر النموذج إلى `xai/grok-4.3`.
