@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "n3mak:activate": "node scripts/n3mak/activate-grok.mjs",
+    "n3mak:smoke": "node scripts/n3mak/smoke-grok.mjs",
+    "n3mak:client": "node examples/n3mak/openai_client.mjs"
+  },
+  "allowScripts": {
+    "better-sqlite3": true,
+    "tls-client-node": true,
+    "onnxruntime-node": true,
+    "better-sqlite3@13.0.3": true,
+    "tls-client-node@0.2.0": true,
+    "onnxruntime-node@1.24.3": true
+  },
+  "note": "Merge into package.json (already applied on machines that ran npm install-scripts approve). npm run scripts are also available as node scripts/n3mak/*.mjs"
+}
