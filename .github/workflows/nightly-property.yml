@@ -17,7 +17,9 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          npm ci || npm install --no-audit --no-fund
       - name: fast-check random seed (high runs)
         id: prop
         run: FC_SEED=random FC_NUM_RUNS=2000 npm run test:property
