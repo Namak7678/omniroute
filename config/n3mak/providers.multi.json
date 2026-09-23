@@ -1,0 +1,32 @@
+{
+  "providers": [
+    {
+      "provider": "groq",
+      "name": "n3mak-groq",
+      "defaultModel": "llama-3.3-70b-versatile",
+      "priority": 2,
+      "credentialEnv": "GROQ_API_KEY"
+    },
+    {
+      "provider": "gemini",
+      "name": "n3mak-gemini",
+      "defaultModel": "gemini-2.5-flash",
+      "priority": 3,
+      "credentialEnv": "GEMINI_API_KEY"
+    },
+    {
+      "provider": "openrouter",
+      "name": "n3mak-openrouter",
+      "defaultModel": "meta-llama/llama-3.3-70b-instruct:free",
+      "priority": 4,
+      "credentialEnv": "OPENROUTER_API_KEY"
+    },
+    {
+      "provider": "anthropic",
+      "name": "n3mak-claude",
+      "defaultModel": "claude-haiku-4.5",
+      "priority": 5,
+      "credentialEnv": "ANTHROPIC_API_KEY"
+    }
+  ]
+}
