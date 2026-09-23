@@ -1,6 +1,6 @@
 {
   "profile": "n3mak-free",
-  "description": "Default free Cloudflare Playground (cfp/*). Official xAI Grok is optional paid fallback.",
+  "description": "Default free Cloudflare Playground (cfp/*). Official xAI Grok is optional paid fallback. Additional real-API fallbacks (Groq/Gemini/OpenRouter/Anthropic) added by n3mak:activate-providers; xai/Grok section unchanged.",
   "baseUrl": "http://127.0.0.1:20128/v1",
   "defaultModel": "cfp/openai/gpt-oss-20b",
   "fallbackModels": [
@@ -10,7 +10,11 @@
     "xai/grok-4.3",
     "xai/grok-4.6",
     "xai/grok-4.20-0309-non-reasoning",
-    "xai/grok-build-0.1"
+    "xai/grok-build-0.1",
+    "groq/llama-3.3-70b-versatile",
+    "gemini/gemini-2.5-flash",
+    "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+    "anthropic/claude-haiku-4.5"
   ],
   "providerIds": {
     "freePlayground": "cloudflare-playground",
@@ -27,7 +31,9 @@
     "console": "https://console.x.ai"
   },
   "envVars": {
-    "requiredForLiveGrok": ["XAI_API_KEY"],
+    "requiredForLiveGrok": [
+      "XAI_API_KEY"
+    ],
     "requiredForFreePath": [],
     "optional": [
       "OMNIROUTE_API_KEY",
@@ -36,7 +42,11 @@
       "OMNIROUTE_GROK_TLS_TIMEOUT_MS",
       "OMNIROUTE_GROK_TLS_GRACE_MS",
       "GROK_AUTH_PATH",
-      "GROK_OAUTH_CLIENT_ID"
+      "GROK_OAUTH_CLIENT_ID",
+      "GROQ_API_KEY",
+      "GEMINI_API_KEY",
+      "OPENROUTER_API_KEY",
+      "ANTHROPIC_API_KEY"
     ]
   }
 }
