@@ -17,19 +17,31 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          npm ci || npm install --no-audit --no-fund
       - name: fast-check random seed (high runs)
         id: prop
         run: FC_SEED=random FC_NUM_RUNS=2000 npm run test:property
-      - name: Open issue on failure
+      - name: Report failure
         if: failure()
         uses: actions/github-script@v9
         with:
           script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: "Nightly property-test failure (Fase 8 B)",
-              body: "fast-check found a counterexample with a random seed. Check the run logs for the reproducible seed + minimal case, then add it as a fixture.\n\nRun: " + context.serverUrl + "/" + context.repo.owner + "/" + context.repo.repo + "/actions/runs/" + context.runId,
-              labels: ["quality-gate-finding"],
-            });
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            core.warning(`Nightly property-test failed: ${runUrl}`);
+            try {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: "Nightly property-test failure (Fase 8 B)",
+                body: "fast-check found a counterexample with a random seed. Check the run logs for the reproducible seed + minimal case, then add it as a fixture.\n\nRun: " + runUrl,
+                labels: ["quality-gate-finding"],
+              });
+            } catch (err) {
+              if (err.status === 410 || err.status === 403) {
+                core.warning(`Issues disabled or forbidden (${err.status}); logged run only.`);
+                return;
+              }
+              throw err;
+            }
