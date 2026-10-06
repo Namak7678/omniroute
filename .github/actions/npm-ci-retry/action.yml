@@ -1,5 +1,5 @@
 name: npm ci with retry
-description: Run npm ci with retries for transient registry/network failures.
+description: Run npm ci with retries for transient registry/network failures, and fall back to npm install when the lockfile is out of sync.
 runs:
   using: composite
   steps:
@@ -9,17 +9,29 @@ runs:
 
         max_attempts=3
         delay_seconds=20
+        log="$(mktemp)"
 
         for attempt in $(seq 1 "$max_attempts"); do
           if [ "$attempt" -gt 1 ]; then
             echo "npm ci attempt $attempt/$max_attempts after transient failure"
           fi
 
-          if npm ci; then
+          set +e
+          npm ci >"$log" 2>&1
+          exit_code=$?
+          set -e
+          cat "$log"
+
+          if [ "$exit_code" -eq 0 ]; then
             exit 0
           fi
 
-          exit_code=$?
+          if grep -qE 'Missing: .* from lock file|are in sync' "$log"; then
+            echo "Lockfile drift detected; falling back to npm install"
+            npm install
+            exit 0
+          fi
+
           if [ "$attempt" -eq "$max_attempts" ]; then
             exit "$exit_code"
           fi
